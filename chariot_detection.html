@@ -21,335 +21,127 @@
     --font-ui: 'Exo 2', sans-serif;
   }
 
-  html, body {
-    width: 100%; height: 100%;
-    background: var(--dark);
-    overflow: hidden;
-    font-family: var(--font-ui);
-    color: #fff;
-  }
+  html, body { width: 100%; height: 100%; background: var(--dark); overflow: hidden; font-family: var(--font-ui); color: #fff; }
+  #app { position: relative; width: 100vw; height: 100vh; }
 
-  #app {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* ── ÉCRAN DE DÉMARRAGE ── */
+  /* ── START SCREEN ── */
   #startScreen {
-    position: absolute;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: var(--dark);
-    gap: 32px;
-    padding: 32px;
+    position: absolute; inset: 0; z-index: 100;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--dark); gap: 28px; padding: 32px;
   }
 
-  .logo-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
+  .logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 
   .logo-icon {
-    width: 72px;
-    height: 72px;
-    border: 3px solid var(--green);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    box-shadow: 0 0 24px rgba(0,255,136,0.3);
+    width: 72px; height: 72px;
+    border: 3px solid var(--green); border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    animation: glow-pulse 2s infinite;
   }
 
-  .logo-icon svg {
-    width: 40px;
-    height: 40px;
+  @keyframes glow-pulse {
+    0%,100% { box-shadow: 0 0 24px rgba(0,255,136,0.3); }
+    50% { box-shadow: 0 0 48px rgba(0,255,136,0.65); }
   }
 
-  .logo-title {
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    color: #fff;
-  }
-
-  .logo-sub {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--green);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-  }
+  .logo-icon svg { width: 40px; height: 40px; }
+  .logo-title { font-size: 28px; font-weight: 800; letter-spacing: 3px; }
+  .logo-sub { font-family: var(--font-mono); font-size: 11px; color: var(--green); letter-spacing: 4px; text-transform: uppercase; }
 
   .info-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    padding: 20px 24px;
-    width: 100%;
-    max-width: 340px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 20px 24px; width: 100%; max-width: 340px;
   }
+  .info-card h3 { font-size: 11px; font-weight: 600; color: var(--green); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
+  .info-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .info-list li { display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(255,255,255,0.7); font-family: var(--font-mono); }
+  .info-list li::before { content: '▸'; color: var(--green); font-size: 10px; flex-shrink: 0; }
 
-  .info-card h3 {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--green);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-
-  .info-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .info-list li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    color: rgba(255,255,255,0.7);
-    font-family: var(--font-mono);
-  }
-
-  .info-list li::before {
-    content: '▸';
-    color: var(--green);
-    font-size: 10px;
-    flex-shrink: 0;
-  }
+  .progress-bar-wrap { width: 100%; max-width: 340px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; }
+  #progressBar { height: 100%; width: 0%; background: var(--green); border-radius: 99px; transition: width 0.3s ease; box-shadow: 0 0 8px var(--green); }
 
   #startBtn {
-    background: var(--green);
-    color: var(--dark);
-    border: none;
-    border-radius: 14px;
-    padding: 18px 48px;
-    font-family: var(--font-ui);
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    cursor: pointer;
-    width: 100%;
-    max-width: 340px;
-    transition: transform 0.1s, box-shadow 0.2s;
-    box-shadow: 0 0 32px rgba(0,255,136,0.25);
+    background: var(--green); color: var(--dark); border: none; border-radius: 14px;
+    padding: 18px 48px; font-family: var(--font-ui); font-size: 16px; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+    width: 100%; max-width: 340px; transition: transform 0.1s, opacity 0.2s;
   }
+  #startBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+  #startBtn:not(:disabled):active { transform: scale(0.97); }
 
-  #startBtn:active { transform: scale(0.97); }
+  #loadingMsg { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.4); text-align: center; min-height: 20px; letter-spacing: 1px; }
 
-  #loadingMsg {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    text-align: center;
-    min-height: 20px;
-    letter-spacing: 1px;
-  }
+  /* ── CAM VIEW ── */
+  #camWrap { position: relative; width: 100vw; height: 100vh; display: none; }
+  #video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-  /* ── CAMÉRA ── */
-  #camWrap {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    display: none;
-  }
-
-  #video {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  #canvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-
-  /* ── ALERT OVERLAY ── */
   #alertOverlay {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 10;
-    border: 6px solid transparent;
-    transition: border-color 0.15s, background 0.15s;
+    position: absolute; inset: 0; pointer-events: none; z-index: 10;
+    border: 5px solid transparent; transition: border-color 0.1s, background 0.1s;
   }
-
   #alertOverlay.danger {
-    border-color: var(--red);
-    background: rgba(255, 34, 68, 0.12);
-    animation: pulse-border 0.6s infinite;
+    border-color: var(--red); background: rgba(255,34,68,0.08);
+    animation: pulse-border 0.5s infinite;
   }
-
   @keyframes pulse-border {
-    0%, 100% { border-color: var(--red); }
-    50% { border-color: rgba(255,34,68,0.3); }
+    0%,100% { border-color: var(--red); background: rgba(255,34,68,0.08); }
+    50% { border-color: rgba(255,34,68,0.35); background: rgba(255,34,68,0.02); }
   }
 
-  /* ── HUD TOP ── */
+  /* ── HUD ── */
   #hud {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    z-index: 20;
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    background: linear-gradient(to bottom, rgba(8,12,16,0.8) 0%, transparent 100%);
+    position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+    padding: 14px 16px; display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(to bottom, rgba(8,12,16,0.88) 0%, transparent 100%);
     pointer-events: none;
   }
-
   .hud-badge {
-    background: var(--panel);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    padding: 6px 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    background: var(--panel); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 6px 12px; display: flex; align-items: center; gap: 8px;
   }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: blink 1.2s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.15; } }
+  .hud-label { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.85); letter-spacing: 1px; }
 
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: blink 1.4s infinite;
+  .hud-pill {
+    font-family: var(--font-mono); font-size: 11px;
+    background: var(--panel); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px; padding: 5px 10px; color: rgba(255,255,255,0.4);
   }
+  #countDisplay { color: var(--yellow); border-color: rgba(255,230,0,0.15); }
 
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  .hud-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: rgba(255,255,255,0.8);
-    letter-spacing: 1px;
-  }
-
-  .fps-counter {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: rgba(255,255,255,0.4);
-    padding: 6px 10px;
-  }
-
-  /* ── STATUS BAR BOTTOM ── */
+  /* ── STATUS BAR ── */
   #statusBar {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    z-index: 20;
-    padding: 12px 16px 28px;
-    background: linear-gradient(to top, rgba(8,12,16,0.9) 0%, transparent 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 20;
+    padding: 12px 16px 34px;
+    background: linear-gradient(to top, rgba(8,12,16,0.92) 0%, transparent 100%);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
     pointer-events: none;
   }
-
   #statusChip {
-    padding: 10px 24px;
-    border-radius: 100px;
-    font-family: var(--font-ui);
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-    background: rgba(0,255,136,0.15);
-    color: var(--green);
-    border: 1.5px solid rgba(0,255,136,0.4);
+    padding: 11px 28px; border-radius: 100px;
+    font-family: var(--font-ui); font-size: 15px; font-weight: 800;
+    letter-spacing: 3px; text-transform: uppercase; transition: all 0.15s;
+    background: rgba(0,255,136,0.12); color: var(--green);
+    border: 1.5px solid rgba(0,255,136,0.35);
   }
-
   #statusChip.danger {
-    background: rgba(255,34,68,0.2);
-    color: var(--red);
-    border-color: rgba(255,34,68,0.6);
-    box-shadow: 0 0 20px rgba(255,34,68,0.2);
+    background: rgba(255,34,68,0.18); color: var(--red);
+    border-color: rgba(255,34,68,0.55); box-shadow: 0 0 24px rgba(255,34,68,0.25);
   }
-
-  #detailText {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 1px;
-  }
-
-  /* ── ZONE SLIDER CONTROLS ── */
-  #controls {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
-    pointer-events: all;
-  }
-
-  .ctrl-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .ctrl-label {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 1px;
-    writing-mode: horizontal-tb;
-    text-align: center;
-  }
-
-  input[type=range].vert {
-    -webkit-appearance: slider-vertical;
-    writing-mode: vertical-lr;
-    direction: rtl;
-    width: 28px;
-    height: 80px;
-    cursor: pointer;
-    accent-color: var(--green);
-    opacity: 0.7;
-  }
+  #detailText { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- START SCREEN -->
   <div id="startScreen">
     <div class="logo-wrap">
       <div class="logo-icon">
-        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="28" width="32" height="6" rx="3" fill="#00ff88" opacity="0.2"/>
+        <svg viewBox="0 0 40 40" fill="none">
+          <rect x="4" y="28" width="32" height="6" rx="3" fill="#00ff88" opacity="0.15"/>
           <rect x="12" y="28" width="4" height="4" rx="2" fill="#00ff88"/>
           <rect x="24" y="28" width="4" height="4" rx="2" fill="#00ff88"/>
           <rect x="8" y="10" width="24" height="18" rx="3" stroke="#00ff88" stroke-width="2" fill="none"/>
@@ -359,24 +151,24 @@
         </svg>
       </div>
       <div class="logo-title">CHARIOT<span style="color:var(--green)">·AI</span></div>
-      <div class="logo-sub">Détection obstacle · v1.0</div>
+      <div class="logo-sub">Détection obstacle · v2.0</div>
     </div>
 
     <div class="info-card">
-      <h3>Comment ça fonctionne</h3>
+      <h3>Améliorations v2</h3>
       <ul class="info-list">
-        <li>La caméra filme la voie devant le chariot</li>
-        <li>La zone verte = trajectoire du chariot</li>
-        <li>Si une personne est détectée dedans → STOP</li>
-        <li>Bounding box rouge autour des personnes</li>
+        <li>Modèle MobileNet V2 — plus précis</li>
+        <li>Jusqu'à 10 personnes simultanées</li>
+        <li>Bounding box lissée (anti-tremblement)</li>
+        <li>Seuil de détection abaissé à 35%</li>
       </ul>
     </div>
 
-    <button id="startBtn" onclick="startApp()">Démarrer</button>
-    <div id="loadingMsg">Chargement du modèle IA...</div>
+    <div class="progress-bar-wrap"><div id="progressBar"></div></div>
+    <button id="startBtn" onclick="startApp()" disabled>Chargement...</button>
+    <div id="loadingMsg">Initialisation du modèle IA...</div>
   </div>
 
-  <!-- CAM VIEW -->
   <div id="camWrap">
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
@@ -385,20 +177,10 @@
     <div id="hud">
       <div class="hud-badge">
         <div class="dot"></div>
-        <span class="hud-label">LIVE · COCO-SSD</span>
+        <span class="hud-label">LIVE · MobileNet V2</span>
       </div>
-      <div class="fps-counter" id="fpsDisplay">-- FPS</div>
-    </div>
-
-    <div id="controls">
-      <div class="ctrl-wrap">
-        <input type="range" class="vert" id="zoneWidth" min="10" max="90" value="35" oninput="updateZone()">
-        <span class="ctrl-label">LARG.</span>
-      </div>
-      <div class="ctrl-wrap">
-        <input type="range" class="vert" id="zoneHeight" min="20" max="90" value="60" oninput="updateZone()">
-        <span class="ctrl-label">HAUT.</span>
-      </div>
+      <div class="hud-pill" id="countDisplay">0 pers.</div>
+      <div class="hud-pill" id="fpsDisplay">-- FPS</div>
     </div>
 
     <div id="statusBar">
@@ -411,172 +193,196 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
 <script>
-let model = null;
-let video = null;
-let canvas = null;
-let ctx = null;
-let animId = null;
+let model = null, video = null, canvas = null, ctx = null;
 let zone = { x: 0, y: 0, w: 0, h: 0 };
 let lastFrameTime = performance.now();
-let fps = 0;
-let frameCount = 0;
-let fpsTimer = 0;
+let frameCount = 0, fpsTimer = 0, currentFps = 0;
+let smoothedBoxes = {};
+let seenKeys = new Set();
+let isDetecting = false;
+const SMOOTH = 0.3; // interpolation — plus bas = plus lisse
 
-// Pré-chargement du modèle en fond
-cocoSsd.load({ base: 'lite_mobilenet_v2' }).then(m => {
+// Barre de progression animée
+let progressVal = 0, progressInterval = null;
+function animateProgress(target) {
+  if (progressInterval) clearInterval(progressInterval);
+  progressInterval = setInterval(() => {
+    progressVal += (target - progressVal) * 0.07;
+    document.getElementById('progressBar').style.width = progressVal + '%';
+    if (Math.abs(progressVal - target) < 0.3) clearInterval(progressInterval);
+  }, 30);
+}
+
+animateProgress(20);
+document.getElementById('loadingMsg').textContent = 'Chargement MobileNet V2 (10-20s)...';
+
+cocoSsd.load({ base: 'mobilenet_v2' }).then(m => {
   model = m;
-  document.getElementById('loadingMsg').textContent = '✓ Modèle chargé — prêt à démarrer';
-  document.getElementById('startBtn').style.boxShadow = '0 0 40px rgba(0,255,136,0.5)';
+  animateProgress(100);
+  setTimeout(() => {
+    document.getElementById('loadingMsg').textContent = '✓ Modèle chargé — prêt !';
+    const btn = document.getElementById('startBtn');
+    btn.disabled = false;
+    btn.textContent = 'Démarrer';
+    btn.style.boxShadow = '0 0 40px rgba(0,255,136,0.5)';
+  }, 500);
 }).catch(e => {
-  document.getElementById('loadingMsg').textContent = '⚠ Erreur chargement modèle';
-  console.error(e);
+  document.getElementById('loadingMsg').textContent = '⚠ Erreur chargement — vérifie ta connexion';
 });
 
-function updateZone() {
-  if (!canvas) return;
-  const wPct = parseInt(document.getElementById('zoneWidth').value) / 100;
-  const hPct = parseInt(document.getElementById('zoneHeight').value) / 100;
-  const zw = canvas.width * wPct;
-  const zh = canvas.height * hPct;
-  zone = {
-    x: (canvas.width - zw) / 2,
-    y: canvas.height - zh,
-    w: zw,
-    h: zh
-  };
+function computeZone() {
+  const zw = canvas.width * 0.40;
+  const zh = canvas.height * 0.65;
+  zone = { x: (canvas.width - zw) / 2, y: canvas.height - zh, w: zw, h: zh };
 }
 
 async function startApp() {
-  if (!model) {
-    document.getElementById('loadingMsg').textContent = '⏳ Patiente, modèle en cours...';
-    return;
-  }
-
+  if (document.getElementById('startBtn').disabled) return;
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
       audio: false
     });
-
     video = document.getElementById('video');
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
-
     video.srcObject = stream;
     await video.play();
-
     video.addEventListener('loadedmetadata', () => {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      updateZone();
+      computeZone();
     });
-
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('camWrap').style.display = 'block';
-
     detectLoop();
   } catch(e) {
-    document.getElementById('loadingMsg').textContent = '⚠ Accès caméra refusé';
-    console.error(e);
+    document.getElementById('loadingMsg').textContent = '⚠ Caméra refusée — autorise l\'accès';
   }
 }
 
-function rectOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+function overlap(ax, ay, aw, ah, bx, by, bw, bh) {
   return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }
 
+function smoothBox(key, newBox) {
+  if (!smoothedBoxes[key]) { smoothedBoxes[key] = [...newBox]; return smoothedBoxes[key]; }
+  const s = smoothedBoxes[key];
+  for (let i = 0; i < 4; i++) s[i] += (newBox[i] - s[i]) * SMOOTH;
+  return s;
+}
+
+function drawZone() {
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,255,136,0.06)';
+  ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+  ctx.strokeStyle = 'rgba(0,255,136,0.55)';
+  ctx.lineWidth = 2.5;
+  ctx.setLineDash([14, 7]);
+  ctx.strokeRect(zone.x, zone.y, zone.w, zone.h);
+  ctx.setLineDash([]);
+
+  // Coins
+  const cs = 20;
+  ctx.strokeStyle = 'rgba(0,255,136,0.85)';
+  ctx.lineWidth = 3.5;
+  [[zone.x, zone.y, 1, 1],[zone.x+zone.w, zone.y, -1, 1],[zone.x, zone.y+zone.h, 1, -1],[zone.x+zone.w, zone.y+zone.h, -1, -1]].forEach(([cx,cy,dx,dy]) => {
+    ctx.beginPath(); ctx.moveTo(cx+dx*cs, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy+dy*cs); ctx.stroke();
+  });
+  ctx.restore();
+}
+
+function drawPerson(box, score, inZone) {
+  const [bx, by, bw, bh] = box;
+  const color = inZone ? '#ff2244' : '#ffe600';
+  ctx.save();
+
+  // Remplissage léger
+  ctx.fillStyle = inZone ? 'rgba(255,34,68,0.07)' : 'rgba(255,230,0,0.05)';
+  ctx.fillRect(bx, by, bw, bh);
+
+  // Bordure
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 18;
+  ctx.strokeRect(bx, by, bw, bh);
+
+  // Coins décoratifs
+  const cs = Math.min(22, bw * 0.2);
+  ctx.lineWidth = 4;
+  [[bx,by,1,1],[bx+bw,by,-1,1],[bx,by+bh,1,-1],[bx+bw,by+bh,-1,-1]].forEach(([cx,cy,dx,dy]) => {
+    ctx.beginPath(); ctx.moveTo(cx+dx*cs,cy); ctx.lineTo(cx,cy); ctx.lineTo(cx,cy+dy*cs); ctx.stroke();
+  });
+  ctx.shadowBlur = 0;
+
+  // Label
+  const conf = Math.round(score * 100);
+  const label = inZone ? `⚠ DANGER  ${conf}%` : `PERSONNE  ${conf}%`;
+  const fontSize = Math.max(12, Math.min(16, canvas.width * 0.028));
+  ctx.font = `700 ${fontSize}px 'Exo 2', sans-serif`;
+  ctx.textAlign = 'left';
+  const tw = ctx.measureText(label).width;
+  const lh = fontSize + 10;
+  ctx.fillStyle = inZone ? 'rgba(255,34,68,0.92)' : 'rgba(220,200,0,0.95)';
+  ctx.beginPath();
+  ctx.roundRect(bx, by - lh, tw + 16, lh, [5, 5, 5, 0]);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.fillText(label, bx + 8, by - 5);
+
+  ctx.restore();
+}
+
 async function detectLoop() {
-  if (!video || video.readyState < 2) {
-    animId = requestAnimationFrame(detectLoop);
-    return;
+  if (!video || video.readyState < 2) { requestAnimationFrame(detectLoop); return; }
+
+  if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    computeZone();
   }
-
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  updateZone();
-
-  const predictions = await model.detect(video);
 
   // FPS
   const now = performance.now();
   frameCount++;
   fpsTimer += now - lastFrameTime;
   lastFrameTime = now;
-  if (fpsTimer > 500) {
-    fps = Math.round((frameCount / fpsTimer) * 1000);
-    document.getElementById('fpsDisplay').textContent = fps + ' FPS';
-    frameCount = 0;
-    fpsTimer = 0;
+  if (fpsTimer >= 700) {
+    currentFps = Math.round((frameCount / fpsTimer) * 1000);
+    document.getElementById('fpsDisplay').textContent = currentFps + ' FPS';
+    frameCount = 0; fpsTimer = 0;
+  }
+
+  let predictions = [];
+  if (!isDetecting) {
+    isDetecting = true;
+    try { predictions = await model.detect(video, 10, 0.35); } catch(e) {}
+    isDetecting = false;
   }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawZone();
 
-  // Zone verte (trajectoire)
-  ctx.save();
-  ctx.strokeStyle = 'rgba(0,255,136,0.6)';
-  ctx.lineWidth = 3;
-  ctx.setLineDash([12, 6]);
-  ctx.strokeRect(zone.x, zone.y, zone.w, zone.h);
-  ctx.fillStyle = 'rgba(0,255,136,0.08)';
-  ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
-
-  // Label zone
-  ctx.setLineDash([]);
-  ctx.fillStyle = 'rgba(0,255,136,0.7)';
-  ctx.font = `bold ${Math.max(10, canvas.width * 0.025)}px 'Share Tech Mono', monospace`;
-  ctx.textAlign = 'center';
-  ctx.fillText('ZONE CHARIOT', zone.x + zone.w / 2, zone.y + 20);
-  ctx.restore();
-
-  // Personnes
-  const persons = predictions.filter(p => p.class === 'person' && p.score > 0.45);
+  const persons = predictions.filter(p => p.class === 'person');
+  const newSeenKeys = new Set();
   let danger = false;
 
-  persons.forEach(p => {
-    const [bx, by, bw, bh] = p.bbox;
-    const inZone = rectOverlap(bx, by, bw, bh, zone.x, zone.y, zone.w, zone.h);
+  persons.forEach((p, i) => {
+    const key = `p${i}`;
+    newSeenKeys.add(key);
+    const box = smoothBox(key, p.bbox);
+    const inZone = overlap(box[0], box[1], box[2], box[3], zone.x, zone.y, zone.w, zone.h);
     if (inZone) danger = true;
-
-    const color = inZone ? '#ff2244' : '#ffe600';
-
-    // Bounding box
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 12;
-    ctx.strokeRect(bx, by, bw, bh);
-
-    // Coins décoratifs
-    const cs = 14;
-    ctx.lineWidth = 4;
-    // TL
-    ctx.beginPath(); ctx.moveTo(bx, by + cs); ctx.lineTo(bx, by); ctx.lineTo(bx + cs, by); ctx.stroke();
-    // TR
-    ctx.beginPath(); ctx.moveTo(bx + bw - cs, by); ctx.lineTo(bx + bw, by); ctx.lineTo(bx + bw, by + cs); ctx.stroke();
-    // BL
-    ctx.beginPath(); ctx.moveTo(bx, by + bh - cs); ctx.lineTo(bx, by + bh); ctx.lineTo(bx + cs, by + bh); ctx.stroke();
-    // BR
-    ctx.beginPath(); ctx.moveTo(bx + bw - cs, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + bh - cs); ctx.stroke();
-
-    // Label
-    const conf = Math.round(p.score * 100);
-    const label = inZone ? `⚠ DANGER · ${conf}%` : `PERSONNE · ${conf}%`;
-    const fontSize = Math.max(10, canvas.width * 0.028);
-    ctx.font = `bold ${fontSize}px 'Exo 2', sans-serif`;
-    ctx.textAlign = 'left';
-    const tw = ctx.measureText(label).width;
-    ctx.fillStyle = color;
-    ctx.globalAlpha = 0.85;
-    ctx.fillRect(bx, by - fontSize - 8, tw + 12, fontSize + 8);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = inZone ? '#fff' : '#000';
-    ctx.fillText(label, bx + 6, by - 5);
-
-    ctx.restore();
+    drawPerson(box, p.score, inZone);
   });
 
-  // UI feedback
+  // Purge boxes disparues
+  for (const k of seenKeys) if (!newSeenKeys.has(k)) delete smoothedBoxes[k];
+  seenKeys = newSeenKeys;
+
+  // UI
+  document.getElementById('countDisplay').textContent = persons.length + ' pers.';
   const overlay = document.getElementById('alertOverlay');
   const chip = document.getElementById('statusChip');
   const detail = document.getElementById('detailText');
@@ -585,17 +391,15 @@ async function detectLoop() {
     overlay.classList.add('danger');
     chip.classList.add('danger');
     chip.textContent = '⛔ OBSTACLE';
-    detail.textContent = `${persons.length} personne(s) dans la zone — ARRÊT`;
+    detail.textContent = `Personne(s) dans la zone — ARRÊT`;
   } else {
     overlay.classList.remove('danger');
     chip.classList.remove('danger');
     chip.textContent = 'VOIE LIBRE';
-    detail.textContent = persons.length > 0
-      ? `${persons.length} personne(s) hors zone`
-      : 'Aucune personne détectée';
+    detail.textContent = persons.length > 0 ? `${persons.length} pers. détectée(s) — hors zone` : 'Aucune personne détectée';
   }
 
-  animId = requestAnimationFrame(detectLoop);
+  requestAnimationFrame(detectLoop);
 }
 </script>
 </body>
