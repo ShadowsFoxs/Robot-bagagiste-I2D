@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Chariot · Détection</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.10.0/tf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.10.0/tf-backend-webgl.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #00ff88;
+    --red: #ff2244;
+    --yellow: #ffe600;
+    --dark: #080c10;
+    --panel: rgba(8,12,16,0.85);
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-ui: 'Exo 2', sans-serif;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--dark);
+    overflow: hidden;
+    font-family: var(--font-ui);
+    color: #fff;
+  }
+
+  #app {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── ÉCRAN DE DÉMARRAGE ── */
+  #startScreen {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--dark);
+    gap: 32px;
+    padding: 32px;
+  }
+
+  .logo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-icon {
+    width: 72px;
+    height: 72px;
+    border: 3px solid var(--green);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 0 24px rgba(0,255,136,0.3);
+  }
+
+  .logo-icon svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo-title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+
+  .logo-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .info-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 20px 24px;
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .info-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .info-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .info-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    font-family: var(--font-mono);
+  }
+
+  .info-list li::before {
+    content: '▸';
+    color: var(--green);
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  #startBtn {
+    background: var(--green);
+    color: var(--dark);
+    border: none;
+    border-radius: 14px;
+    padding: 18px 48px;
+    font-family: var(--font-ui);
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: 100%;
+    max-width: 340px;
+    transition: transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 0 32px rgba(0,255,136,0.25);
+  }
+
+  #startBtn:active { transform: scale(0.97); }
+
+  #loadingMsg {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    min-height: 20px;
+    letter-spacing: 1px;
+  }
+
+  /* ── CAMÉRA ── */
+  #camWrap {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+  }
+
+  #video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* ── ALERT OVERLAY ── */
+  #alertOverlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    border: 6px solid transparent;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  #alertOverlay.danger {
+    border-color: var(--red);
+    background: rgba(255, 34, 68, 0.12);
+    animation: pulse-border 0.6s infinite;
+  }
+
+  @keyframes pulse-border {
+    0%, 100% { border-color: var(--red); }
+    50% { border-color: rgba(255,34,68,0.3); }
+  }
+
+  /* ── HUD TOP ── */
+  #hud {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: linear-gradient(to bottom, rgba(8,12,16,0.8) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .hud-badge {
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: blink 1.4s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .hud-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 1px;
+  }
+
+  .fps-counter {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    padding: 6px 10px;
+  }
+
+  /* ── STATUS BAR BOTTOM ── */
+  #statusBar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 20;
+    padding: 12px 16px 28px;
+    background: linear-gradient(to top, rgba(8,12,16,0.9) 0%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  #statusChip {
+    padding: 10px 24px;
+    border-radius: 100px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    background: rgba(0,255,136,0.15);
+    color: var(--green);
+    border: 1.5px solid rgba(0,255,136,0.4);
+  }
+
+  #statusChip.danger {
+    background: rgba(255,34,68,0.2);
+    color: var(--red);
+    border-color: rgba(255,34,68,0.6);
+    box-shadow: 0 0 20px rgba(255,34,68,0.2);
+  }
+
+  #detailText {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+  }
+
+  /* ── ZONE SLIDER CONTROLS ── */
+  #controls {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    pointer-events: all;
+  }
+
+  .ctrl-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .ctrl-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+    writing-mode: horizontal-tb;
+    text-align: center;
+  }
+
+  input[type=range].vert {
+    -webkit-appearance: slider-vertical;
+    writing-mode: vertical-lr;
+    direction: rtl;
+    width: 28px;
+    height: 80px;
+    cursor: pointer;
+    accent-color: var(--green);
+    opacity: 0.7;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div id="startScreen">
+    <div class="logo-wrap">
+      <div class="logo-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="28" width="32" height="6" rx="3" fill="#00ff88" opacity="0.2"/>
+          <rect x="12" y="28" width="4" height="4" rx="2" fill="#00ff88"/>
+          <rect x="24" y="28" width="4" height="4" rx="2" fill="#00ff88"/>
+          <rect x="8" y="10" width="24" height="18" rx="3" stroke="#00ff88" stroke-width="2" fill="none"/>
+          <circle cx="20" cy="19" r="5" stroke="#00ff88" stroke-width="1.5" fill="none"/>
+          <circle cx="20" cy="19" r="2" fill="#00ff88"/>
+          <line x1="20" y1="10" x2="20" y2="13" stroke="#00ff88" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="logo-title">CHARIOT<span style="color:var(--green)">·AI</span></div>
+      <div class="logo-sub">Détection obstacle · v1.0</div>
+    </div>
+
+    <div class="info-card">
+      <h3>Comment ça fonctionne</h3>
+      <ul class="info-list">
+        <li>La caméra filme la voie devant le chariot</li>
+        <li>La zone verte = trajectoire du chariot</li>
+        <li>Si une personne est détectée dedans → STOP</li>
+        <li>Bounding box rouge autour des personnes</li>
+      </ul>
+    </div>
+
+    <button id="startBtn" onclick="startApp()">Démarrer</button>
+    <div id="loadingMsg">Chargement du modèle IA...</div>
+  </div>
+
+  <!-- CAM VIEW -->
+  <div id="camWrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+    <div id="alertOverlay"></div>
+
+    <div id="hud">
+      <div class="hud-badge">
+        <div class="dot"></div>
+        <span class="hud-label">LIVE · COCO-SSD</span>
+      </div>
+      <div class="fps-counter" id="fpsDisplay">-- FPS</div>
+    </div>
+
+    <div id="controls">
+      <div class="ctrl-wrap">
+        <input type="range" class="vert" id="zoneWidth" min="10" max="90" value="35" oninput="updateZone()">
+        <span class="ctrl-label">LARG.</span>
+      </div>
+      <div class="ctrl-wrap">
+        <input type="range" class="vert" id="zoneHeight" min="20" max="90" value="60" oninput="updateZone()">
+        <span class="ctrl-label">HAUT.</span>
+      </div>
+    </div>
+
+    <div id="statusBar">
+      <div id="statusChip">VOIE LIBRE</div>
+      <div id="detailText">Aucune personne détectée</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
+<script>
+let model = null;
+let video = null;
+let canvas = null;
+let ctx = null;
+let animId = null;
+let zone = { x: 0, y: 0, w: 0, h: 0 };
+let lastFrameTime = performance.now();
+let fps = 0;
+let frameCount = 0;
+let fpsTimer = 0;
+
+// Pré-chargement du modèle en fond
+cocoSsd.load({ base: 'lite_mobilenet_v2' }).then(m => {
+  model = m;
+  document.getElementById('loadingMsg').textContent = '✓ Modèle chargé — prêt à démarrer';
+  document.getElementById('startBtn').style.boxShadow = '0 0 40px rgba(0,255,136,0.5)';
+}).catch(e => {
+  document.getElementById('loadingMsg').textContent = '⚠ Erreur chargement modèle';
+  console.error(e);
+});
+
+function updateZone() {
+  if (!canvas) return;
+  const wPct = parseInt(document.getElementById('zoneWidth').value) / 100;
+  const hPct = parseInt(document.getElementById('zoneHeight').value) / 100;
+  const zw = canvas.width * wPct;
+  const zh = canvas.height * hPct;
+  zone = {
+    x: (canvas.width - zw) / 2,
+    y: canvas.height - zh,
+    w: zw,
+    h: zh
+  };
+}
+
+async function startApp() {
+  if (!model) {
+    document.getElementById('loadingMsg').textContent = '⏳ Patiente, modèle en cours...';
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false
+    });
+
+    video = document.getElementById('video');
+    canvas = document.getElementById('canvas');
+    ctx = canvas.getContext('2d');
+
+    video.srcObject = stream;
+    await video.play();
+
+    video.addEventListener('loadedmetadata', () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      updateZone();
+    });
+
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('camWrap').style.display = 'block';
+
+    detectLoop();
+  } catch(e) {
+    document.getElementById('loadingMsg').textContent = '⚠ Accès caméra refusé';
+    console.error(e);
+  }
+}
+
+function rectOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+  return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+}
+
+async function detectLoop() {
+  if (!video || video.readyState < 2) {
+    animId = requestAnimationFrame(detectLoop);
+    return;
+  }
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  updateZone();
+
+  const predictions = await model.detect(video);
+
+  // FPS
+  const now = performance.now();
+  frameCount++;
+  fpsTimer += now - lastFrameTime;
+  lastFrameTime = now;
+  if (fpsTimer > 500) {
+    fps = Math.round((frameCount / fpsTimer) * 1000);
+    document.getElementById('fpsDisplay').textContent = fps + ' FPS';
+    frameCount = 0;
+    fpsTimer = 0;
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Zone verte (trajectoire)
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,255,136,0.6)';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([12, 6]);
+  ctx.strokeRect(zone.x, zone.y, zone.w, zone.h);
+  ctx.fillStyle = 'rgba(0,255,136,0.08)';
+  ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+
+  // Label zone
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(0,255,136,0.7)';
+  ctx.font = `bold ${Math.max(10, canvas.width * 0.025)}px 'Share Tech Mono', monospace`;
+  ctx.textAlign = 'center';
+  ctx.fillText('ZONE CHARIOT', zone.x + zone.w / 2, zone.y + 20);
+  ctx.restore();
+
+  // Personnes
+  const persons = predictions.filter(p => p.class === 'person' && p.score > 0.45);
+  let danger = false;
+
+  persons.forEach(p => {
+    const [bx, by, bw, bh] = p.bbox;
+    const inZone = rectOverlap(bx, by, bw, bh, zone.x, zone.y, zone.w, zone.h);
+    if (inZone) danger = true;
+
+    const color = inZone ? '#ff2244' : '#ffe600';
+
+    // Bounding box
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 12;
+    ctx.strokeRect(bx, by, bw, bh);
+
+    // Coins décoratifs
+    const cs = 14;
+    ctx.lineWidth = 4;
+    // TL
+    ctx.beginPath(); ctx.moveTo(bx, by + cs); ctx.lineTo(bx, by); ctx.lineTo(bx + cs, by); ctx.stroke();
+    // TR
+    ctx.beginPath(); ctx.moveTo(bx + bw - cs, by); ctx.lineTo(bx + bw, by); ctx.lineTo(bx + bw, by + cs); ctx.stroke();
+    // BL
+    ctx.beginPath(); ctx.moveTo(bx, by + bh - cs); ctx.lineTo(bx, by + bh); ctx.lineTo(bx + cs, by + bh); ctx.stroke();
+    // BR
+    ctx.beginPath(); ctx.moveTo(bx + bw - cs, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + bh - cs); ctx.stroke();
+
+    // Label
+    const conf = Math.round(p.score * 100);
+    const label = inZone ? `⚠ DANGER · ${conf}%` : `PERSONNE · ${conf}%`;
+    const fontSize = Math.max(10, canvas.width * 0.028);
+    ctx.font = `bold ${fontSize}px 'Exo 2', sans-serif`;
+    ctx.textAlign = 'left';
+    const tw = ctx.measureText(label).width;
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.85;
+    ctx.fillRect(bx, by - fontSize - 8, tw + 12, fontSize + 8);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = inZone ? '#fff' : '#000';
+    ctx.fillText(label, bx + 6, by - 5);
+
+    ctx.restore();
+  });
+
+  // UI feedback
+  const overlay = document.getElementById('alertOverlay');
+  const chip = document.getElementById('statusChip');
+  const detail = document.getElementById('detailText');
+
+  if (danger) {
+    overlay.classList.add('danger');
+    chip.classList.add('danger');
+    chip.textContent = '⛔ OBSTACLE';
+    detail.textContent = `${persons.length} personne(s) dans la zone — ARRÊT`;
+  } else {
+    overlay.classList.remove('danger');
+    chip.classList.remove('danger');
+    chip.textContent = 'VOIE LIBRE';
+    detail.textContent = persons.length > 0
+      ? `${persons.length} personne(s) hors zone`
+      : 'Aucune personne détectée';
+  }
+
+  animId = requestAnimationFrame(detectLoop);
+}
+</script>
+</body>
+</html>
